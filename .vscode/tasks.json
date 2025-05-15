@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "java (buildArtifact)",
+			"mainClass": "net.shy.SketchBrowser",
+			"targetPath": "${workspaceFolder}/bin/${workspaceFolderBasename}.jar",
+			"elements": [
+				"${compileOutput:ProcessingSketches_166654e3}",
+				"${dependencies:ProcessingSketches_166654e3}",
+				"${compileOutput:SimpleGUI_a908a2d3}",
+			],
+			"problemMatcher": [],
+			"label": "java (buildArtifact): ProcessingSketches"
+		}
+	]
+}

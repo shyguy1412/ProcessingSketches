@@ -1,6 +1,6 @@
 package net.shy.ui;
 
-import net.nilsramstoeck.simplegui.SPanel;
+import net.shy.simplegui.SPanel;
 import processing.core.PApplet;
 
 public class Console extends SPanel{

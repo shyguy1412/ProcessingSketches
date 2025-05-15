@@ -1,15 +1,7 @@
 package net.shy;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import net.shy.reflection.SketchLoader;
 import processing.core.PApplet;
-import processing.core.PImage;
 
 public class SketchBrowser extends PApplet {
     SketchCollection sketches = new SketchCollection();
