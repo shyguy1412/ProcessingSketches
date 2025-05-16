@@ -1,11 +1,13 @@
 package net.shy.sketches.flowfield;
 
 import net.shy.Sketch;
+import processing.core.PGraphics;
 import processing.core.PVector;
 
 public class PerlinNoiseFlowField extends Sketch {
   FlowField flowfield;
   Particle[] particle;
+  PGraphics g;
 
   int grid = 10;
 
@@ -17,7 +19,7 @@ public class PerlinNoiseFlowField extends Sketch {
   @Override
   public void setup() {
     // fullScreen();
-    particle = new Particle[1000];
+    particle = new Particle[45000];
     for (int i = 0; i < particle.length; i++) {
       PVector startPos = new PVector(random(width), random(height));
       particle[i] = new Particle(this, startPos.x, startPos.y);
@@ -26,19 +28,25 @@ public class PerlinNoiseFlowField extends Sketch {
     // flowfield.show();
     background(0);
     colorMode(HSB, 100);
+    g = createGraphics(width, height);
+    frameRate(31);
   }
-
+  
   @Override
   public void draw() {
-    // background(255);
+    g.beginDraw();
+    g.colorMode(HSB, 100);
+    g.background(0, 5);
     flowfield.update();
-    // flowfield.show();
+    // flowfield.render();
 
     for (Particle p : particle) {
       p.follow(flowfield);
       p.update();
-      p.render();
+      p.render(g);
     }
+    g.endDraw();
+    image(g, 0, 0);
   }
 
   // void mousePressed() {

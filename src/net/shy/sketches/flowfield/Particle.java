@@ -22,7 +22,7 @@ class Particle {
 
   void follow(FlowField field) {
     PVector v = field.getVectorAt(pos.x, pos.y);
-    acc.add(v);
+    acc.add(v.setHeading(v.heading() + ((float) field.randomnessSlider.getValue())));
   }
 
   void update() {
@@ -38,10 +38,10 @@ class Particle {
     acc.mult(0);
   }
 
-  void render() {
-    app.stroke(h, 100, 100, 5);
-    app.strokeWeight(1);
-    app.line(prevPos.x, prevPos.y, pos.x, pos.y);
+  void render(PGraphics g) {
+    g.stroke(h, 100, 100);
+    g.strokeWeight(1);
+    g.line(prevPos.x, prevPos.y, pos.x, pos.y);
     prevPos = pos.copy();
     h = (h < 100 ? h + 1 : 0);
   }
