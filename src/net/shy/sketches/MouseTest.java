@@ -27,7 +27,7 @@ public class MouseTest extends Sketch implements SClickListener {
 
   @Override
   public void mouseMoved() {
-    println(mouseX, mouseY);
+    // println(mouseX, mouseY);
   }
 
   @Override

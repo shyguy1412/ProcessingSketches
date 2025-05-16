@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import net.shy.reflection.SketchLoader;
 import net.shy.simplegui.SButton;
 import net.shy.simplegui.SCanvas;
+import net.shy.simplegui.SImage;
 import net.shy.simplegui.SScrollPanel;
 import processing.core.PApplet;
 import processing.core.PVector;
@@ -16,7 +17,7 @@ public class SketchBrowser extends PApplet {
     SketchCollection sketches = new SketchCollection();
     SScrollPanel sketchViewport;
     SScrollPanel sketchList;
-    SCanvas sketchCanvas;
+    SImage sketchView;
 
     public static void main(String[] args) {
         PApplet.main(SketchBrowser.class.getName());
@@ -28,6 +29,7 @@ public class SketchBrowser extends PApplet {
         Set<Class<?>> sketches = SketchLoader.loadSketches();
         for (Class<?> sketch : sketches) {
             this.sketches.add(sketch);
+            println(sketch);
         }
     }
 
@@ -78,10 +80,9 @@ public class SketchBrowser extends PApplet {
         sketchViewport = new SScrollPanel(this, sketchListWidth(), 0, width - sketchListWidth(),
                 height, selectedSketch.width,
                 selectedSketch.height);
-        sketchCanvas = new SCanvas(this, sketchViewport.getWidth() / 2 - selectedSketch.width / 2,
-                sketchViewport.getHeight() / 2 - selectedSketch.height / 2, selectedSketch.width,
-                selectedSketch.height);
-        sketchViewport.addComponent(sketchCanvas);
+        sketchView = new SImage(this, sketchViewport.getWidth() / 2 - selectedSketch.width / 2,
+                sketchViewport.getHeight() / 2 - selectedSketch.height / 2);
+        sketchViewport.addComponent(sketchView);
 
         sketchViewport.setBackgroundColor(40);
         sketchViewport.setBorderWidth(0);
@@ -92,10 +93,22 @@ public class SketchBrowser extends PApplet {
     public void draw() {
         background(0);
         Sketch currentSketch = sketches.getSelectedSketch();
-        sketchCanvas.g.beginDraw();
-        sketchCanvas.g.image(currentSketch.get(), 0, 0);
-        sketchCanvas.g.endDraw();
-        
+
+        sketchList.setWidth(sketchListWidth());
+        sketchList.setActualWidth(sketchListWidth());
+        sketchList.setHeight(height);
+
+        sketchViewport.pos.x = sketchListWidth();
+        sketchViewport.setWidth(width - sketchListWidth());
+        sketchViewport.setHeight(height);
+        sketchViewport.setActualWidth(currentSketch.width);
+        sketchViewport.setActualHeight(currentSketch.height);
+
+        sketchView.pos.x = sketchViewport.getWidth() / 2 - currentSketch.width / 2;
+        sketchView.pos.y = sketchViewport.getHeight() / 2 - currentSketch.height / 2;
+
+        sketchView.i = currentSketch.get();
+
         sketchList.draw();
         sketchViewport.draw();
 
@@ -111,30 +124,12 @@ public class SketchBrowser extends PApplet {
     }
 
     @Override
-    public void windowResized() {
-        Sketch selectedSketch = sketches.getSelectedSketch();
-
-        sketchList.setWidth(sketchListWidth());
-        sketchList.setActualWidth(sketchListWidth());
-        sketchList.setHeight(height);
-
-        sketchViewport.pos.x = sketchListWidth();
-        sketchViewport.setWidth(width - sketchListWidth());
-        sketchViewport.setHeight(height);
-        sketchViewport.setActualWidth(selectedSketch.width);
-        sketchViewport.setActualHeight(selectedSketch.height);
-
-        sketchCanvas.pos.x = sketchViewport.getWidth() / 2 - selectedSketch.width / 2;
-        sketchCanvas.pos.y = sketchViewport.getHeight() / 2 - selectedSketch.height / 2;
-    }
-
-    @Override
     public void postEvent(Event pe) {
         super.postEvent(pe);
         boolean isMouseEvent = MouseEvent.class.isAssignableFrom(pe.getClass());
         if (isMouseEvent) {
             MouseEvent me = (MouseEvent) pe;
-            PVector localizedMouse = sketchCanvas.globalToLocal(me.getX(), me.getY());
+            PVector localizedMouse = sketchView.globalToLocal(me.getX(), me.getY());
             pe = new MouseEvent(
                     me.getNative(),
                     me.getMillis(),
