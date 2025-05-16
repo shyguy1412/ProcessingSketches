@@ -15,6 +15,7 @@ import processing.event.MouseEvent;
 public class SketchBrowser extends PApplet {
     SketchCollection sketches = new SketchCollection();
     SScrollPanel sketchViewport;
+    SScrollPanel sketchList;
     SCanvas sketchCanvas;
 
     public static void main(String[] args) {
@@ -23,7 +24,6 @@ public class SketchBrowser extends PApplet {
 
     @Override
     public void settings() {
-        // size(300, 300);
         size(1000, 800);
         Set<Class<?>> sketches = SketchLoader.loadSketches();
         for (Class<?> sketch : sketches) {
@@ -31,19 +31,26 @@ public class SketchBrowser extends PApplet {
         }
     }
 
+    int sketchListWidth() {
+        return 200;
+    }
+
     @Override
     public void setup() {
-        // windowResizable(true);
+        windowResizable(true);
 
         Sketch selectedSketch = sketches.getSelectedSketch();
-        SScrollPanel sketchList = new SScrollPanel(
+        sketchList = new SScrollPanel(
                 this,
                 0,
                 0,
-                width / 3,
+                sketchListWidth(),
                 height,
-                width / 3,
-                1000);
+                sketchListWidth(),
+                height);
+
+        sketchList.setBorderWidth(0);
+        sketchList.setBackgroundColor(28);
 
         int index = 0;
         for (Entry<Class<?>, Sketch> sketchEntry : sketches) {
@@ -55,6 +62,12 @@ public class SketchBrowser extends PApplet {
             float y = margin + index * (h + margin);
             SButton button = new SButton(this, x, y, w, h);
             button.setLabel(sketchClass.getSimpleName());
+            button.setBackgroundColor(40);
+            button.setLabelColor(255);
+            button.setBorderColor(255);
+            button.setHoverBackgroundColor(70);
+            button.setHoverBorderColor(255);
+            button.setHoverLabelColor(255);
             button.addClickListener(sketches);
             if (sketchClass.getSimpleName() == "MouseTest")
                 button.dispatchClickEvent();
@@ -62,21 +75,34 @@ public class SketchBrowser extends PApplet {
             index++;
         }
 
-        sketchViewport = new SScrollPanel(this, width / 3, 0, width - width / 3,
+        sketchViewport = new SScrollPanel(this, sketchListWidth(), 0, width - sketchListWidth(),
                 height, selectedSketch.width,
                 selectedSketch.height);
-        sketchCanvas = new SCanvas(this, 0, 0, selectedSketch.width,
+        sketchCanvas = new SCanvas(this, sketchViewport.getWidth() / 2 - selectedSketch.width / 2,
+                sketchViewport.getHeight() / 2 - selectedSketch.height / 2, selectedSketch.width,
                 selectedSketch.height);
         sketchViewport.addComponent(sketchCanvas);
+
+        sketchViewport.setBackgroundColor(40);
+        sketchViewport.setBorderWidth(0);
+
     }
 
     @Override
     public void draw() {
+        background(0);
         Sketch currentSketch = sketches.getSelectedSketch();
         sketchCanvas.g.beginDraw();
         sketchCanvas.g.image(currentSketch.get(), 0, 0);
         sketchCanvas.g.endDraw();
-        background(0);
+        
+        sketchList.draw();
+        sketchViewport.draw();
+
+        fill(255);
+        noStroke();
+        textSize(50);
+        text(nf(frameRate, 0, 2), width - 150, 50);
     }
 
     @Override
@@ -86,7 +112,20 @@ public class SketchBrowser extends PApplet {
 
     @Override
     public void windowResized() {
-        println(width, height);
+        Sketch selectedSketch = sketches.getSelectedSketch();
+
+        sketchList.setWidth(sketchListWidth());
+        sketchList.setActualWidth(sketchListWidth());
+        sketchList.setHeight(height);
+
+        sketchViewport.pos.x = sketchListWidth();
+        sketchViewport.setWidth(width - sketchListWidth());
+        sketchViewport.setHeight(height);
+        sketchViewport.setActualWidth(selectedSketch.width);
+        sketchViewport.setActualHeight(selectedSketch.height);
+
+        sketchCanvas.pos.x = sketchViewport.getWidth() / 2 - selectedSketch.width / 2;
+        sketchCanvas.pos.y = sketchViewport.getHeight() / 2 - selectedSketch.height / 2;
     }
 
     @Override
@@ -95,7 +134,7 @@ public class SketchBrowser extends PApplet {
         boolean isMouseEvent = MouseEvent.class.isAssignableFrom(pe.getClass());
         if (isMouseEvent) {
             MouseEvent me = (MouseEvent) pe;
-            PVector localizedMouse = sketchViewport.globalToLocal(me.getX(), me.getY()).sub(sketchViewport.pos);
+            PVector localizedMouse = sketchCanvas.globalToLocal(me.getX(), me.getY());
             pe = new MouseEvent(
                     me.getNative(),
                     me.getMillis(),
