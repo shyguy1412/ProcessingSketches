@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 
 import net.shy.reflection.SketchLoader;
 import net.shy.simplegui.SButton;
-import net.shy.simplegui.SCanvas;
 import net.shy.simplegui.SImage;
 import net.shy.simplegui.SScrollPanel;
 import processing.core.PApplet;
@@ -71,7 +70,7 @@ public class SketchBrowser extends PApplet {
             button.setHoverBorderColor(255);
             button.setHoverLabelColor(255);
             button.addClickListener(sketches);
-            if (sketchClass.getSimpleName() == "MouseTest")
+            if (sketchClass.getSimpleName().equals("PerlinNoiseFlowField"))
                 button.dispatchClickEvent();
             sketchList.addComponent(button);
             index++;
@@ -86,7 +85,6 @@ public class SketchBrowser extends PApplet {
 
         sketchViewport.setBackgroundColor(40);
         sketchViewport.setBorderWidth(0);
-
     }
 
     @Override
@@ -107,7 +105,7 @@ public class SketchBrowser extends PApplet {
         sketchView.pos.x = sketchViewport.getWidth() / 2 - currentSketch.width / 2;
         sketchView.pos.y = sketchViewport.getHeight() / 2 - currentSketch.height / 2;
 
-        sketchView.i = currentSketch.get();
+        sketchView.i = currentSketch.getBuffer();
 
         sketchList.draw();
         sketchViewport.draw();
@@ -115,7 +113,7 @@ public class SketchBrowser extends PApplet {
         fill(255);
         noStroke();
         textSize(50);
-        text(nf(frameRate, 0, 2), width - 150, 50);
+        text(nf(currentSketch.frameRate, 0, 2), width - 150, 50);
     }
 
     @Override
